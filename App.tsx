@@ -5,119 +5,104 @@ import {
   Text,
   Pressable,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+} from 'react-native-safe-area-context';
+
+import HomeScreen from './screens/HomeScreen';
+import MorseScreen from './screens/MorseScreen';
+import VibrationScreen from './screens/VibrationScreen';
+
+type Pantalla = 'inicio' | 'morse' | 'voz';
 
 export default function App() {
-  const [morse, setMorse] = useState('');
+  const [pantalla, setPantalla] = useState<Pantalla>('inicio');
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>MorseYa</Text>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.app}>
+        <StatusBar barStyle="light-content" />
 
-      <Text style={styles.subtitle}>
-        Comunicación que se siente 💜
-      </Text>
+        {pantalla === 'inicio' ? (
+          <HomeScreen
+            onMorse={() => setPantalla('morse')}
+            onVoice={() => setPantalla('voz')}
+          />
+        ) : (
+          <View style={styles.contenedor}>
+            <View style={styles.cabecera}>
+              <Pressable
+                onPress={() => setPantalla('inicio')}
+                accessibilityRole="button"
+                accessibilityLabel="Volver al inicio"
+                style={styles.volver}
+              >
+                <Text style={styles.flecha}>‹</Text>
+              </Pressable>
 
-      <Text style={styles.description}>
-        Transforma cada señal en una oportunidad
-        para comunicarte.
-      </Text>
+              <Text style={styles.titulo}>
+                {pantalla === 'morse'
+                  ? 'Morse → Voz'
+                  : 'Voz → Vibración'}
+              </Text>
 
-      <View style={styles.card}>
-        <Text style={styles.heading}>
-          Morse a voz
-        </Text>
+              <View style={styles.espaciador} />
+            </View>
 
-        <Text style={styles.result}>
-          {morse || 'Introduce tu mensaje'}
-        </Text>
-
-        <View style={styles.buttons}>
-          <Pressable
-            style={styles.button}
-            onPress={() => setMorse(morse + '.')}
-          >
-            <Text style={styles.buttonText}>● Punto</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.button}
-            onPress={() => setMorse(morse + '-')}
-          >
-            <Text style={styles.buttonText}>━ Raya</Text>
-          </Pressable>
-        </View>
-
-        <Pressable onPress={() => setMorse('')}>
-          <Text style={styles.clear}>Limpiar mensaje</Text>
-        </Pressable>
-      </View>
-    </View>
+            <View style={styles.contenido}>
+              {pantalla === 'morse' ? (
+                <MorseScreen />
+              ) : (
+                <VibrationScreen />
+              )}
+            </View>
+          </View>
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  app: {
     flex: 1,
-    backgroundColor: '#F5F3FF',
+    backgroundColor: '#101827',
+  },
+  contenedor: {
+    flex: 1,
+  },
+  cabecera: {
+    height: 64,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    backgroundColor: '#101827',
+  },
+  volver: {
+    width: 54,
+    height: 54,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
   },
-  title: {
+  flecha: {
+    color: '#35D6C1',
     fontSize: 42,
-    fontWeight: 'bold',
-    color: '#6D28D9',
+    lineHeight: 48,
   },
-  subtitle: {
-    fontSize: 19,
-    color: '#7C3AED',
-    marginTop: 8,
-  },
-  description: {
-    textAlign: 'center',
-    marginVertical: 24,
-    fontSize: 16,
-    color: '#475569',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    borderRadius: 20,
-    width: '100%',
-    maxWidth: 450,
-  },
-  heading: {
-    fontSize: 23,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  result: {
-    fontSize: 28,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#6D28D9',
-  },
-  buttons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  button: {
+  titulo: {
     flex: 1,
-    backgroundColor: '#6D28D9',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
-  clear: {
-    marginTop: 24,
+    color: '#F8FAFC',
+    fontSize: 22,
+    fontWeight: '700',
     textAlign: 'center',
-    color: '#6D28D9',
-    fontWeight: 'bold',
+  },
+  espaciador: {
+    width: 54,
+  },
+  contenido: {
+    flex: 1,
   },
 });
