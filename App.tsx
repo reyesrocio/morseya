@@ -10,6 +10,7 @@ import {
 
 import HomeScreen from './screens/HomeScreen';
 import MorseScreen from './screens/MorseScreen';
+import VibrationScreen from './screens/VibrationScreen';
 
 type Pantalla = 'inicio' | 'morse' | 'voz';
 
@@ -43,7 +44,7 @@ export default function App() {
             <MorseScreen />
           ) : (
             <View style={styles.placeholder}>
-              <Text style={styles.title}>Voz a vibración</Text>
+              <VibrationScreen />
               <Text style={styles.description}>
                 Estamos preparando esta función.
               </Text>
