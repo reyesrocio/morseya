@@ -10,12 +10,13 @@ import {
 import * as Speech from 'expo-speech';
 import { morseATexto } from '../utils/morse';
 
-const COLOR = {
+const C = {
   fondo: '#101827',
-  superficie: '#1D293B',
+  panel: '#1D293B',
   turquesa: '#35D6C1',
   blanco: '#F8FAFC',
-  secundario: '#CBD5E1',
+  gris: '#CBD5E1',
+  boton: '#103E43',
 };
 
 export default function MorseScreen() {
@@ -41,6 +42,7 @@ export default function MorseScreen() {
       setEstado('Señal demasiado larga');
       return;
     }
+
     setSenal(actual => actual + simbolo);
     setEstado('');
   }
@@ -59,7 +61,14 @@ export default function MorseScreen() {
   }
 
   function separarPalabra() {
-    const nuevas = senal ? [...letras, senal] : letras;
+    if (senal && morseATexto(senal) === '?') {
+      setEstado('Corrige la última señal');
+      return;
+    }
+
+    const nuevas = senal
+      ? [...letras, senal]
+      : letras;
 
     if (
       nuevas.length === 0 ||
@@ -77,6 +86,7 @@ export default function MorseScreen() {
     } else {
       setLetras(actual => actual.slice(0, -1));
     }
+
     setEstado('');
   }
 
@@ -93,15 +103,18 @@ export default function MorseScreen() {
 
     try {
       await Speech.stop();
-      Speech.speak(mensaje, {
+
+      Speech.speak(mensaje.trim(), {
         language: 'es-PE',
         rate: 0.9,
+
         onStart: () => setHablando(true),
         onDone: () => setHablando(false),
         onStopped: () => setHablando(false),
+
         onError: () => {
           setHablando(false);
-          setEstado('No se pudo reproducir la voz');
+          setEstado('No se pudo reproducir');
         },
       });
     } catch {
@@ -128,10 +141,11 @@ export default function MorseScreen() {
       style={styles.pantalla}
       contentContainerStyle={styles.contenido}
     >
-      <Text style={styles.encabezado}>Morse → Voz</Text>
-
-      <View style={styles.mensajePanel}>
-        <Text style={styles.etiqueta}>MENSAJE</Text>
+      {/* MENSAJE */}
+      <View style={styles.panel}>
+        <Text style={styles.etiqueta}>
+          MENSAJE
+        </Text>
 
         <Text
           style={styles.mensaje}
@@ -142,50 +156,61 @@ export default function MorseScreen() {
 
         <View style={styles.divisor} />
 
-        <Text style={styles.etiqueta}>SEÑALES</Text>
+        <Text style={styles.etiqueta}>
+          MORSE
+        </Text>
 
         <Text style={styles.codigo}>
           {codigo || '· —'}
         </Text>
       </View>
 
+      {/* CONTROLES */}
       <View style={styles.teclado}>
         <View style={styles.filaPrincipal}>
+
           <Pressable
-            style={({ pressed }) => [
-              styles.botonPrincipal,
-              pressed && styles.presionado,
-            ]}
             onPress={() => agregar('.')}
             accessibilityRole="button"
             accessibilityLabel="Punto"
-          >
-            <Text style={styles.simbolo}>●</Text>
-            <Text style={styles.textoPrincipal}>Punto</Text>
-          </Pressable>
-
-          <Pressable
             style={({ pressed }) => [
               styles.botonPrincipal,
               pressed && styles.presionado,
             ]}
+          >
+            <Text style={styles.simbolo}>●</Text>
+            <Text style={styles.textoPrincipal}>
+              Punto
+            </Text>
+          </Pressable>
+
+          <Pressable
             onPress={() => agregar('-')}
             accessibilityRole="button"
             accessibilityLabel="Raya"
+            style={({ pressed }) => [
+              styles.botonPrincipal,
+              pressed && styles.presionado,
+            ]}
           >
             <Text style={styles.simbolo}>━</Text>
-            <Text style={styles.textoPrincipal}>Raya</Text>
+            <Text style={styles.textoPrincipal}>
+              Raya
+            </Text>
           </Pressable>
         </View>
 
         <View style={styles.filaSecundaria}>
+
           <Pressable
             style={styles.botonSecundario}
             onPress={confirmarLetra}
             accessibilityRole="button"
             accessibilityLabel="Confirmar letra"
           >
-            <Text style={styles.textoSecundario}>Letra ↵</Text>
+            <Text style={styles.textoSecundario}>
+              Letra ↵
+            </Text>
           </Pressable>
 
           <Pressable
@@ -194,31 +219,41 @@ export default function MorseScreen() {
             accessibilityRole="button"
             accessibilityLabel="Separar palabra"
           >
-            <Text style={styles.textoSecundario}>Palabra /</Text>
+            <Text style={styles.textoSecundario}>
+              Espacio
+            </Text>
           </Pressable>
 
           <Pressable
             style={styles.botonSecundario}
             onPress={borrar}
             accessibilityRole="button"
-            accessibilityLabel="Borrar última señal"
+            accessibilityLabel="Borrar última señal o letra"
           >
-            <Text style={styles.textoSecundario}>⌫</Text>
+            <Text style={styles.textoSecundario}>
+              ⌫
+            </Text>
           </Pressable>
         </View>
 
+        {/* VOZ */}
         <Pressable
           onPress={hablando ? detener : reproducir}
           accessibilityRole="button"
           accessibilityLabel={
-            hablando ? 'Detener voz' : 'Reproducir mensaje'
+            hablando
+              ? 'Detener voz'
+              : 'Hablar mensaje'
           }
-          style={styles.botonVoz}
+          style={({ pressed }) => [
+            styles.botonVoz,
+            pressed && { opacity: 0.85 },
+          ]}
         >
           <Text style={styles.textoVoz}>
             {hablando
-              ? '■ Detener voz'
-              : '▶ Reproducir mensaje'}
+              ? '■ Detener'
+              : '▶ Hablar'}
           </Text>
         </Pressable>
 
@@ -228,11 +263,16 @@ export default function MorseScreen() {
           accessibilityLabel="Limpiar mensaje"
           style={styles.limpiar}
         >
-          <Text style={styles.textoLimpiar}>Limpiar</Text>
+          <Text style={styles.textoLimpiar}>
+            Limpiar
+          </Text>
         </Pressable>
       </View>
 
-      <Text style={styles.estado} accessibilityRole="alert">
+      <Text
+        style={styles.estado}
+        accessibilityRole="alert"
+      >
         {estado}
       </Text>
     </ScrollView>
@@ -242,129 +282,146 @@ export default function MorseScreen() {
 const styles = StyleSheet.create({
   pantalla: {
     flex: 1,
-    backgroundColor: COLOR.fondo,
+    backgroundColor: C.fondo,
   },
+
   contenido: {
     flexGrow: 1,
-    paddingHorizontal: 22,
-    paddingTop: 22,
-    paddingBottom: 30,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 24,
     justifyContent: 'space-between',
   },
-  encabezado: {
-    color: COLOR.blanco,
-    fontSize: 26,
-    fontWeight: '800',
-    marginBottom: 22,
+
+  panel: {
+    backgroundColor: C.panel,
+    borderRadius: 22,
+    padding: 22,
+    minHeight: 185,
   },
-  mensajePanel: {
-    backgroundColor: COLOR.superficie,
-    borderRadius: 24,
-    padding: 24,
-    minHeight: 190,
-    justifyContent: 'center',
-  },
+
   etiqueta: {
-    color: COLOR.secundario,
+    color: C.gris,
     fontSize: 13,
     fontWeight: '600',
-    letterSpacing: 1.3,
+    letterSpacing: 1,
   },
+
   mensaje: {
-    color: COLOR.blanco,
+    color: C.blanco,
     fontSize: 34,
     fontWeight: '800',
-    marginTop: 12,
+    marginTop: 14,
     marginBottom: 18,
   },
+
   divisor: {
     height: 1,
     backgroundColor: '#415064',
     marginBottom: 16,
   },
+
   codigo: {
-    color: COLOR.turquesa,
+    color: C.turquesa,
     fontSize: 22,
     marginTop: 10,
     fontWeight: '600',
+    lineHeight: 32,
   },
+
   teclado: {
-    marginTop: 30,
+    marginTop: 24,
   },
+
   filaPrincipal: {
     flexDirection: 'row',
-    gap: 14,
+    gap: 12,
   },
+
   botonPrincipal: {
     flex: 1,
-    minHeight: 145,
-    borderRadius: 25,
-    backgroundColor: '#103E43',
+    minHeight: 135,
+    borderRadius: 22,
+    backgroundColor: C.boton,
     borderWidth: 2,
-    borderColor: COLOR.turquesa,
-    justifyContent: 'center',
+    borderColor: C.turquesa,
     alignItems: 'center',
+    justifyContent: 'center',
   },
+
   presionado: {
     backgroundColor: '#17615F',
     transform: [{ scale: 0.97 }],
   },
+
   simbolo: {
+    color: C.turquesa,
     fontSize: 48,
     fontWeight: '800',
-    color: COLOR.turquesa,
   },
+
   textoPrincipal: {
-    color: COLOR.blanco,
+    color: C.blanco,
     fontSize: 18,
     fontWeight: '700',
-    marginTop: 10,
+    marginTop: 8,
   },
+
   filaSecundaria: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 18,
+    marginTop: 14,
   },
+
   botonSecundario: {
     flex: 1,
-    minHeight: 62,
-    backgroundColor: COLOR.superficie,
+    minHeight: 58,
+    backgroundColor: C.panel,
     borderRadius: 14,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 5,
   },
+
   textoSecundario: {
-    color: COLOR.blanco,
+    color: C.blanco,
     fontSize: 15,
     fontWeight: '600',
     textAlign: 'center',
   },
+
   botonVoz: {
+    backgroundColor: C.turquesa,
     minHeight: 66,
-    backgroundColor: COLOR.turquesa,
     borderRadius: 18,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 26,
+    justifyContent: 'center',
+    marginTop: 24,
   },
+
   textoVoz: {
-    color: COLOR.fondo,
-    fontSize: 19,
+    color: C.fondo,
+    fontSize: 21,
     fontWeight: '800',
   },
+
   limpiar: {
     alignItems: 'center',
-    padding: 16,
+    justifyContent: 'center',
+    minHeight: 48,
+    marginTop: 8,
   },
+
   textoLimpiar: {
-    color: COLOR.secundario,
+    color: C.gris,
     fontSize: 16,
   },
+
   estado: {
-    color: COLOR.turquesa,
-    minHeight: 22,
-    fontSize: 15,
+    color: C.turquesa,
+    fontSize: 14,
     textAlign: 'center',
+    minHeight: 20,
+    marginTop: 8,
   },
 });

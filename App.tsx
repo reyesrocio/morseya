@@ -4,9 +4,13 @@ import {
   View,
   Text,
   Pressable,
-  StatusBar,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+} from 'react-native-safe-area-context';
 
 import HomeScreen from './screens/HomeScreen';
 import MorseScreen from './screens/MorseScreen';
@@ -18,73 +22,87 @@ export default function App() {
   const [pantalla, setPantalla] = useState<Pantalla>('inicio');
 
   return (
-    <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#101827"
-      />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.app}>
+        <StatusBar barStyle="light-content" />
 
-      {pantalla === 'inicio' ? (
-        <HomeScreen
-          onMorse={() => setPantalla('morse')}
-          onVoice={() => setPantalla('voz')}
-        />
-      ) : (
-        <View style={styles.container}>
-          <Pressable
-            onPress={() => setPantalla('inicio')}
-            accessibilityRole="button"
-            accessibilityLabel="Volver al inicio"
-            style={styles.backButton}
-          >
-            <Text style={styles.backText}>← Volver</Text>
-          </Pressable>
+        {pantalla === 'inicio' ? (
+          <HomeScreen
+            onMorse={() => setPantalla('morse')}
+            onVoice={() => setPantalla('voz')}
+          />
+        ) : (
+          <View style={styles.contenedor}>
+            <View style={styles.cabecera}>
+              <Pressable
+                onPress={() => setPantalla('inicio')}
+                accessibilityRole="button"
+                accessibilityLabel="Volver al inicio"
+                style={styles.volver}
+              >
+                <Text style={styles.flecha}>‹</Text>
+              </Pressable>
 
-          {pantalla === 'morse' ? (
-            <MorseScreen />
-          ) : (
-            <View style={styles.placeholder}>
-              <VibrationScreen />
-              <Text style={styles.description}>
-                Estamos preparando esta función.
+              <Text style={styles.titulo}>
+                {pantalla === 'morse'
+                  ? 'Morse → Voz'
+                  : 'Voz → Vibración'}
               </Text>
+
+              <View style={styles.espaciador} />
             </View>
-          )}
-        </View>
-      )}
-    </View>
+
+            <View style={styles.contenido}>
+              {pantalla === 'morse' ? (
+                <MorseScreen />
+              ) : (
+                <VibrationScreen />
+              )}
+            </View>
+          </View>
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  app: {
     flex: 1,
     backgroundColor: '#101827',
   },
-  backButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 18,
-  },
-  backText: {
-    color: '#35D6C1',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  placeholder: {
+  contenedor: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  cabecera: {
+    height: 64,
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 24,
+    paddingHorizontal: 18,
+    backgroundColor: '#101827',
   },
-  title: {
+  volver: {
+    width: 54,
+    height: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flecha: {
+    color: '#35D6C1',
+    fontSize: 42,
+    lineHeight: 48,
+  },
+  titulo: {
+    flex: 1,
     color: '#F8FAFC',
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  description: {
-    color: '#CBD5E1',
-    fontSize: 16,
-    marginTop: 12,
+    fontSize: 22,
+    fontWeight: '700',
     textAlign: 'center',
+  },
+  espaciador: {
+    width: 54,
+  },
+  contenido: {
+    flex: 1,
   },
 });
