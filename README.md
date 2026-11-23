@@ -84,15 +84,24 @@ npx expo start
 
 Abrir el proyecto en Expo Go para probar las funciones compatibles. El reconocimiento de voz nativo requiere una compilación Android que incluya el módulo correspondiente.
 
-## APK de Android
+## Demo funcional — MorseYa
 
-El proyecto utiliza EAS Build para generar una versión instalable mediante el perfil preview:
+¡Prueba MorseYa directamente en tu dispositivo Android!
 
-bash
-npx eas-cli@latest build --platform android --profile preview
+El prototipo está disponible como una aplicación APK instalable, compilada mediante Expo EAS Build.
 
+**[🚀 Descargar e instalar MorseYa para Android](https://expo.dev/accounts/rocioandreas-team/projects/morseya/builds/1c71388f-34b3-495d-b841-c4fb81505735)**
 
-La APK se obtiene desde el panel de compilaciones de Expo una vez que el proceso finaliza correctamente.
+### Funcionalidades disponibles
+
+- Código Morse → Texto → Voz.
+- Texto → Código Morse → Vibración.
+- Interfaz táctil accesible.
+- Aplicación Android independiente de Expo Go.
+
+**Estado:** MVP funcional — HackODS 2026.
+
+*Nota: La instalación requiere un dispositivo Android compatible. El reconocimiento directo de voz mediante micrófono sigue en desarrollo.*
 
 ## Impacto social
 
