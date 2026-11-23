@@ -1,2 +1,2 @@
 # morseya
-MorseYa - Aplicación web inclusiva de comunicación mediante voz, texto y código Morse.
+MorseYa - Aplicación móvil inclusiva que facilita la comunicación de personas con sordoceguera mediante código Morse, voz y vibraciones.
